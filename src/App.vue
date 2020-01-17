@@ -1,32 +1,68 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
+  <div class="app">
+    <p>name: {{ getName }}</p>
+    <p>age: {{ age }}</p>
+    <p>sex: {{ sex }}</p>
+    <button @click="setName('wwwqqq')">编辑 Name</button>
+    <button @click="setAge(100)">编辑 Age</button>
+    <button @click="setSex('woman')">编辑 Sex</button>
+    <input class="db" placeholder="请输入账号" v-model="formData.user_name" />
+    <input class="db" placeholder="请输入密码" v-model="formData.pswd" />
+    <button class="mt10" @click="login">登录</button>
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+import { createNamespacedHelpers } from 'vuex'
+const { mapState, mapGetters, mapMutations } = createNamespacedHelpers('user')
 
-#nav {
-  padding: 30px;
+import * as http from '@/api/user'
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
+export default {
+  name: 'App',
+  data() {
+    return {
+      formData: {
+        user_name: '',
+        pswd: ''
+      }
     }
+  },
+  created() {
+    this.getUser()
+  },
+  computed: {
+    ...mapState({
+      name: state => state.name,
+      age: state => state.age,
+      sex: state => state.sex
+    }),
+    ...mapGetters(['getName'])
+  },
+  methods: {
+    async login() {
+      console.log('login')
+      try {
+        const data = await http.login(this.formData)
+        console.log(data)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    getUser() {
+      this.$store.dispatch('user/getUserInfo', {
+        name: 'action_wq',
+        age: 'action_age',
+        sex: 'action_sex'
+      })
+    },
+    ...mapMutations(['setName', 'setAge', 'setSex'])
   }
+}
+</script>
+
+<style lang="scss">
+.app {
+  background: $bg-color-orange;
 }
 </style>
